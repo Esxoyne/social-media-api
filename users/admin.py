@@ -3,8 +3,12 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext as _
 
-from .models import User
+from .models import Profile, User
 
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
 
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
@@ -43,6 +47,8 @@ class UserAdmin(DjangoUserAdmin):
         "last_login",
     )
     list_filter = ("is_staff", "is_superuser", "is_active")
+    inlines = (ProfileInline,)
 
 
+admin.site.register(Profile)
 admin.site.unregister(Group)
