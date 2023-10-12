@@ -1,5 +1,6 @@
 [flake8]
 inline-quotes = "
+ignore = F401
 max-line-length = 79
 exclude =
     **migrations
