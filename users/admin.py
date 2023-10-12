@@ -10,6 +10,7 @@ class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
 
+
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     fieldsets = (
