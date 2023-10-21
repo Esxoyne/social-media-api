@@ -35,7 +35,7 @@ class UserSignUpView(generics.GenericAPIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
-class ManageUserView(generics.RetrieveUpdateAPIView):
+class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, Update user info.
     """
@@ -91,6 +91,6 @@ class ProfileDetailView(generics.RetrieveAPIView):
     Retrieve user profiles.
     """
 
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.select_related("user")
     serializer_class = ProfileRetrieveSerializer
     permission_classes = (AllowAny,)
