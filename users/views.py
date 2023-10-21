@@ -85,6 +85,26 @@ class ProfileListView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     permission_classes = (AllowAny,)
 
+    def get_queryset(self):
+        queryset = self.queryset.all()
+
+        if self.request.method.lower() == "get":
+            queryset = queryset.select_related("user")
+
+        username = self.request.query_params.get("username")
+        bio = self.request.query_params.get("bio")
+        country = self.request.query_params.get("country")
+
+        if username:
+            queryset = queryset.filter(user__username__icontains=username)
+
+        if bio:
+            queryset = queryset.filter(bio__icontains=bio)
+
+        if country:
+            queryset = queryset.filter(country__icontains=country)
+
+        return queryset
 
 class ProfileDetailView(generics.RetrieveAPIView):
     """
