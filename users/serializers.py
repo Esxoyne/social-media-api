@@ -12,6 +12,13 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ("is_staff",)
 
 
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ("id", "username", "is_staff")
+        read_only_fields = ("is_staff",)
+
+
 class UserSignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
@@ -27,7 +34,7 @@ class ProfileSerializer(
     CountryFieldMixin,
     serializers.ModelSerializer,
 ):
-    user = UserSerializer(read_only=True)
+    user = UserListSerializer(read_only=True)
 
     class Meta:
         model = Profile
@@ -43,7 +50,7 @@ class ProfileSerializer(
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserListSerializer(read_only=True)
     country = serializers.CharField(source="country.name", read_only=True)
 
     class Meta:
