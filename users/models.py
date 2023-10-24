@@ -1,6 +1,7 @@
 import os
 import uuid
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
@@ -43,7 +44,7 @@ class Profile(models.Model):
         OTHER = "other", "Other"
 
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         on_delete=models.CASCADE,
     )
     picture = models.ImageField(
@@ -58,6 +59,18 @@ class Profile(models.Model):
         blank=True,
     )
     country = CountryField(blank=True)
+    followers = models.ManyToManyField(
+        "self",
+        symmetrical=False,
+        blank=True,
+        related_name="following",
+    )
 
     def __str__(self) -> str:
         return str(self.user)
+
+    def get_follower_count(self) -> int:
+        return self.followers.count()
+
+    def get_following_count(self) -> int:
+        return self.following.count()
