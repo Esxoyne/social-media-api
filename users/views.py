@@ -1,11 +1,16 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Profile
 
 from .serializers import (
+    FollowerListSerializer,
+    FollowingListSerializer,
+    ProfileListSerializer,
     ProfilePictureSerializer,
     ProfileRetrieveSerializer,
     ProfileSerializer,
@@ -64,7 +69,7 @@ class ManageProfileView(generics.RetrieveUpdateAPIView):
         return ProfileSerializer
 
 
-class ManageProfilePictureView(generics.RetrieveUpdateAPIView):
+class ManageProfilePictureView(generics.UpdateAPIView):
     """
     Retrieve, Update user profile picture.
     """
@@ -82,7 +87,7 @@ class ProfileListView(generics.ListAPIView):
     """
 
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = ProfileListSerializer
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
@@ -106,6 +111,7 @@ class ProfileListView(generics.ListAPIView):
 
         return queryset
 
+
 class ProfileDetailView(generics.RetrieveAPIView):
     """
     Retrieve user profiles.
@@ -113,4 +119,52 @@ class ProfileDetailView(generics.RetrieveAPIView):
 
     queryset = Profile.objects.select_related("user")
     serializer_class = ProfileRetrieveSerializer
+    permission_classes = (AllowAny,)
+
+
+class ProfileFollowView(APIView):
+    """
+    Follow/unfollow profile.
+    """
+
+    def get_object(self, pk):
+        return get_object_or_404(Profile, pk=pk)
+
+    def post(self, request, pk, *args, **kwargs):
+        user_profile = request.user.profile
+        target = self.get_object(pk)
+
+        if (
+            user_profile != target
+            and user_profile not in target.followers.all()
+        ):
+            target.followers.add(user_profile)
+            target.save()
+
+            return Response({}, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def delete(self, request, pk, *args, **kwargs):
+        user_profile = request.user.profile
+        target = self.get_object(pk)
+
+        if user_profile != target and user_profile in target.followers.all():
+            target.followers.remove(user_profile)
+            target.save()
+
+            return Response({}, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FollowerListView(generics.RetrieveAPIView):
+    queryset = Profile.objects.select_related("user")
+    serializer_class = FollowerListSerializer
+    permission_classes = (AllowAny,)
+
+
+class FollowingListView(generics.RetrieveAPIView):
+    queryset = Profile.objects.select_related("user")
+    serializer_class = FollowingListSerializer
     permission_classes = (AllowAny,)
