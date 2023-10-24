@@ -35,6 +35,14 @@ class ProfileSerializer(
     serializers.ModelSerializer,
 ):
     user = UserListSerializer(read_only=True)
+    followers = serializers.IntegerField(
+        source="get_follower_count",
+        read_only=True,
+    )
+    following = serializers.IntegerField(
+        source="get_following_count",
+        read_only=True,
+    )
 
     class Meta:
         model = Profile
@@ -45,24 +53,35 @@ class ProfileSerializer(
             "bio",
             "gender",
             "country",
+            "followers",
+            "following",
         )
         read_only_fields = ("picture",)
 
 
-class ProfileRetrieveSerializer(serializers.ModelSerializer):
-    user = UserListSerializer(read_only=True)
-    country = serializers.CharField(source="country.name", read_only=True)
+class ProfileListSerializer(
+    CountryFieldMixin,
+    serializers.ModelSerializer,
+):
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True,
+    )
 
     class Meta:
         model = Profile
         fields = (
             "id",
-            "user",
+            "username",
             "picture",
             "bio",
             "gender",
             "country",
         )
+
+
+class ProfileRetrieveSerializer(ProfileSerializer):
+    country = serializers.CharField(source="country.name", read_only=True)
 
 
 class ProfilePictureSerializer(serializers.ModelSerializer):
@@ -71,4 +90,24 @@ class ProfilePictureSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "picture",
+        )
+
+
+class FollowerListSerializer(serializers.ModelSerializer):
+    followers = ProfileListSerializer(many=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            "followers",
+        )
+
+
+class FollowingListSerializer(serializers.ModelSerializer):
+    following = ProfileListSerializer(many=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            "following",
         )
