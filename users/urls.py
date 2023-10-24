@@ -14,7 +14,7 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("sign-up/", views.UserSignUpView.as_view(), name="sign_up"),
-    path("sign-out/", TokenBlacklistView.as_view(), name="sign_out"),
+    path("logout/", TokenBlacklistView.as_view(), name="logout"),
     path("me/", views.ManageUserView.as_view(), name="manage_user"),
     path(
         "me/profile/",
@@ -31,6 +31,21 @@ urlpatterns = [
         "profiles/<int:pk>/",
         views.ProfileDetailView.as_view(),
         name="profile_detail"
+    ),
+    path(
+        "profiles/<int:pk>/follow/",
+        views.ProfileFollowView.as_view(),
+        name="profile_follow",
+    ),
+    path(
+        "profiles/<int:pk>/followers/",
+        views.FollowerListView.as_view(),
+        name="profile_followers",
+    ),
+    path(
+        "profiles/<int:pk>/following/",
+        views.FollowingListView.as_view(),
+        name="profile_following",
     ),
 ]
 
