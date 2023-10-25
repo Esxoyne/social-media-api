@@ -159,12 +159,12 @@ class ProfileFollowView(APIView):
 
 
 class FollowerListView(generics.RetrieveAPIView):
-    queryset = Profile.objects.select_related("user")
+    queryset = Profile.objects.prefetch_related("followers__user")
     serializer_class = FollowerListSerializer
     permission_classes = (AllowAny,)
 
 
 class FollowingListView(generics.RetrieveAPIView):
-    queryset = Profile.objects.select_related("user")
+    queryset = Profile.objects.prefetch_related("following__user")
     serializer_class = FollowingListSerializer
     permission_classes = (AllowAny,)
