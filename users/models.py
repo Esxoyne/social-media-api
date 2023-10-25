@@ -69,8 +69,10 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return str(self.user)
 
-    def get_follower_count(self) -> int:
+    @property
+    def follower_count(self) -> int:
         return self.followers.count()
 
-    def get_following_count(self) -> int:
+    @property
+    def following_count(self) -> int:
         return self.following.count()

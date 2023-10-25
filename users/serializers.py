@@ -36,11 +36,11 @@ class ProfileSerializer(
 ):
     user = UserListSerializer(read_only=True)
     followers = serializers.IntegerField(
-        source="get_follower_count",
+        source="follower_count",
         read_only=True,
     )
     following = serializers.IntegerField(
-        source="get_following_count",
+        source="following_count",
         read_only=True,
     )
 
