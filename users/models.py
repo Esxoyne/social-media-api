@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+
 from django_countries.fields import CountryField
 
 from .managers import UserManager
@@ -21,7 +22,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self) -> str:
-        return self.email
+        return self.username
 
 
 def generate_file_name(info, filename):
