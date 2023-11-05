@@ -16,8 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "is_staff")
-        read_only_fields = ("is_staff",)
+        fields = ("id", "username")
 
 
 class UserSignUpSerializer(serializers.ModelSerializer):
@@ -75,14 +74,26 @@ class ProfileListSerializer(
             "id",
             "username",
             "picture",
+        )
+
+
+class ProfileRetrieveSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True,
+    )
+    country = serializers.CharField(source="country.name", read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            "id",
+            "username",
+            "picture",
             "bio",
             "gender",
             "country",
         )
-
-
-class ProfileRetrieveSerializer(ProfileSerializer):
-    country = serializers.CharField(source="country.name", read_only=True)
 
 
 class ProfilePictureSerializer(serializers.ModelSerializer):
