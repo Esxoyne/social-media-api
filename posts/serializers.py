@@ -61,11 +61,35 @@ class PostSerializer(
         return post
 
 
-class PostListSerializer(PostSerializer):
+class PostListSerializer(
+    TaggitSerializer,
+    serializers.ModelSerializer,
+):
     user = ProfileListSerializer(source="user.profile", read_only=True)
     images = PostImageListSerializer(many=True, read_only=True)
+    tags = TagListSerializerField(
+        child=serializers.CharField(allow_blank=True, allow_null=True),
+    )
+    likes = serializers.IntegerField(source="like_count", read_only=True)
+
+    class Meta:
+        model = Post
+        fields = (
+            "url",
+            "user",
+            "text",
+            "images",
+            "likes",
+            "created_at",
+            "updated_at",
+            "tags",
+        )
+        read_only_fields = ("user", "likes")
+        extra_kwargs = {
+            "url": {"view_name": "posts:post-detail"},
+        }
 
 
 class PostRetrieveSerializer(PostSerializer):
-    user = ProfileRetrieveSerializer(source="user.profile", read_only=True)
+    user = ProfileListSerializer(source="user.profile", read_only=True)
     images = PostImageSerializer(many=True, read_only=True)

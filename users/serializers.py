@@ -61,7 +61,7 @@ class ProfileSerializer(
 
 class ProfileListSerializer(
     CountryFieldMixin,
-    serializers.ModelSerializer,
+    serializers.HyperlinkedModelSerializer,
 ):
     username = serializers.CharField(
         source="user.username",
@@ -71,10 +71,13 @@ class ProfileListSerializer(
     class Meta:
         model = Profile
         fields = (
-            "id",
+            "url",
             "username",
             "picture",
         )
+        extra_kwargs = {
+            "url": {"view_name": "users:profile-detail"},
+        }
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
