@@ -1,8 +1,10 @@
 from django.db.models import Q
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 from posts.serializers import (
@@ -18,6 +20,20 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (AllowAny,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_fields = ("user",)
+    search_fields = ("text",)
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        tags = self.request.query_params.get("tags")
+
+        if tags:
+            tags = tags.split(",")
+            queryset = queryset.filter(tags__name__in=tags)
+
+        return queryset.distinct()
 
     def get_serializer_class(self):
         if self.action in ("list", "home", "liked"):
