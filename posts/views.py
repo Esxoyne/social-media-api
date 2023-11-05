@@ -20,7 +20,7 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_serializer_class(self):
-        if self.action in ("list", "home"):
+        if self.action in ("list", "home", "liked"):
             return PostListSerializer
 
         if self.action == "retrieve":
@@ -34,7 +34,7 @@ class PostViewSet(viewsets.ModelViewSet):
         url_path="home",
         permission_classes=[AllowAny],
     )
-    def home(self, request):
+    def home(self, request) -> Response:
         """Retrieve posts created by the current user
         or the users they are following"""
         posts = self.get_queryset().filter(
@@ -51,7 +51,7 @@ class PostViewSet(viewsets.ModelViewSet):
         url_path="like",
         permission_classes=[IsAuthenticated],
     )
-    def like(self, request, pk=None):
+    def like(self, request, pk=None) -> Response:
         """Like/unlike a post"""
         user = request.user
         post = self.get_object()
@@ -72,7 +72,7 @@ class PostViewSet(viewsets.ModelViewSet):
         url_path="liked",
         permission_classes=[AllowAny],
     )
-    def liked(self, request):
+    def liked(self, request) -> Response:
         """Retrieve liked posts"""
         posts = self.get_queryset().filter(likes__id=request.user.id)
         serializer = self.get_serializer(posts, many=True)
