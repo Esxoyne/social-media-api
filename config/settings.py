@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "debug_toolbar",
     "django_countries",
+    "taggit",
     "users",
     "posts",
 ]
