@@ -20,9 +20,9 @@ from .serializers import (
 )
 
 
-class UserSignUpView(generics.GenericAPIView):
+class SignUpView(generics.GenericAPIView):
     """
-    Endpoint for creating a new user.
+    Create a new account
     """
 
     permission_classes = (AllowAny,)
@@ -41,9 +41,9 @@ class UserSignUpView(generics.GenericAPIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
-class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
+class ManageAccountView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, Update user info.
+    Retrieve, Update account info
     """
 
     permission_classes = (IsAuthenticated,)
@@ -55,7 +55,7 @@ class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
 
 class ManageProfileView(generics.RetrieveUpdateAPIView):
     """
-    Retrieve, Update user profile.
+    Retrieve, Update user profile
     """
 
     permission_classes = (IsAuthenticated,)
@@ -72,7 +72,7 @@ class ManageProfileView(generics.RetrieveUpdateAPIView):
 
 class ManageProfilePictureView(generics.UpdateAPIView):
     """
-    Retrieve, Update user profile picture.
+    Retrieve, Update user profile picture
     """
 
     serializer_class = ProfilePictureSerializer
@@ -84,7 +84,7 @@ class ManageProfilePictureView(generics.UpdateAPIView):
 
 class ProfileListView(generics.ListAPIView):
     """
-    List user profiles.
+    List user profiles
     """
 
     queryset = Profile.objects.all()
@@ -115,7 +115,7 @@ class ProfileListView(generics.ListAPIView):
 
 class ProfileDetailView(generics.RetrieveAPIView):
     """
-    Retrieve user profiles.
+    Retrieve user profiles
     """
 
     queryset = Profile.objects.select_related("user")
@@ -125,7 +125,7 @@ class ProfileDetailView(generics.RetrieveAPIView):
 
 class ProfileFollowView(APIView):
     """
-    Follow/unfollow profile.
+    Follow/unfollow profile
     """
 
     def get_object(self, pk):
