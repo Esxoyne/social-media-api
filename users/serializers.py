@@ -100,6 +100,14 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
 
 
 class ProfilePictureSerializer(serializers.ModelSerializer):
+    def validate_picture(self, picture):
+        if picture.size > 1000000:
+            raise serializers.ValidationError(
+                "Image size exceeded: 1 MB"
+            )
+
+        return picture
+
     class Meta:
         model = Profile
         fields = (

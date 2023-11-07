@@ -38,6 +38,20 @@ class PostSerializer(
     )
     likes = serializers.IntegerField(source="like_count", read_only=True)
 
+    def validate_images(self, images):
+        if len(images) > 10:
+            raise serializers.ValidationError(
+                "Cannot upload more than 10 images to a post"
+            )
+
+        for image in images:
+            if image.size > 5000000:
+                raise serializers.ValidationError(
+                    "Max image size exceeded: 5 MB"
+                )
+
+        return images
+
     class Meta:
         model = Post
         fields = (
