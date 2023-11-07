@@ -15,6 +15,13 @@ class Post(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
+    parent = models.ForeignKey(
+        "self",
+        related_name="replies",
+        null=True,
+        on_delete=models.CASCADE,
+        default=None,
+    )
     text = models.CharField(max_length=300)
     likes = models.ManyToManyField(
         get_user_model(),
@@ -35,6 +42,10 @@ class Post(models.Model):
     @property
     def like_count(self) -> int:
         return self.likes.count()
+
+    @property
+    def reply_count(self) -> int:
+        return self.replies.count()
 
 
 def generate_file_name(info, filename):
