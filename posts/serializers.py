@@ -37,6 +37,7 @@ class PostSerializer(
         child=serializers.CharField(allow_blank=True, allow_null=True),
     )
     likes = serializers.IntegerField(source="like_count", read_only=True)
+    replies = serializers.IntegerField(source="reply_count", read_only=True)
 
     def validate_images(self, images):
         if len(images) > 10:
@@ -57,14 +58,16 @@ class PostSerializer(
         fields = (
             "id",
             "user",
+            "parent",
             "text",
             "images",
             "likes",
+            "replies",
             "created_at",
             "updated_at",
             "tags",
         )
-        read_only_fields = ("user", "likes")
+        read_only_fields = ("user", "parent", "likes")
 
     def create(self, validated_data):
         images = validated_data.pop("images", None)
@@ -80,25 +83,33 @@ class PostListSerializer(
     serializers.ModelSerializer,
 ):
     user = ProfileListSerializer(source="user.profile", read_only=True)
+    parent = serializers.HyperlinkedRelatedField(
+        view_name="posts:post-detail", read_only=True
+    )
     images = PostImageListSerializer(many=True, read_only=True)
     tags = TagListSerializerField(
-        child=serializers.CharField(allow_blank=True, allow_null=True),
+        child=serializers.CharField(
+            allow_blank=True, allow_null=True, read_only=True
+        ),
     )
     likes = serializers.IntegerField(source="like_count", read_only=True)
+    replies = serializers.IntegerField(source="reply_count", read_only=True)
 
     class Meta:
         model = Post
         fields = (
             "url",
             "user",
+            "parent",
             "text",
             "images",
             "likes",
+            "replies",
             "created_at",
             "updated_at",
             "tags",
         )
-        read_only_fields = ("user", "likes")
+        read_only_fields = ("user", "parent", "likes")
         extra_kwargs = {
             "url": {"view_name": "posts:post-detail"},
         }
