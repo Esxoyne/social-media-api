@@ -14,9 +14,9 @@ urlpatterns = [
     path("token/", TokenObtainPairView.as_view(), name="token-obtain-pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("token/verify/", TokenVerifyView.as_view(), name="token-verify"),
-    path("sign-up/", views.UserSignUpView.as_view(), name="sign-up"),
+    path("sign-up/", views.SignUpView.as_view(), name="sign-up"),
     path("logout/", TokenBlacklistView.as_view(), name="logout"),
-    path("me/", views.ManageUserView.as_view(), name="manage-user"),
+    path("me/account/", views.ManageAccountView.as_view(), name="manage-user"),
     path(
         "me/profile/",
         views.ManageProfileView.as_view(),
