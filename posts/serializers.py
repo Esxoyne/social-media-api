@@ -7,7 +7,6 @@ from taggit.serializers import (
 
 from .models import Post, PostImage
 from users.serializers import (
-    ProfileRetrieveSerializer,
     ProfileListSerializer,
 )
 
