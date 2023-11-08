@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Profile
-
 from .serializers import (
     FollowerListSerializer,
     FollowingListSerializer,
@@ -127,6 +126,7 @@ class ProfileFollowView(APIView):
     """
     Follow/unfollow profile
     """
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         return get_object_or_404(Profile, pk=pk)

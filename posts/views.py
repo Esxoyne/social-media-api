@@ -7,13 +7,13 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-from posts.serializers import (
+from .models import Post
+from .permissions import IsAuthor
+from .serializers import (
     PostListSerializer,
     PostRetrieveSerializer,
     PostSerializer,
 )
-
-from .models import Post
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -49,6 +49,22 @@ class PostViewSet(viewsets.ModelViewSet):
             return PostRetrieveSerializer
 
         return PostSerializer
+
+    def get_permissions(self):
+        if self.action in (
+            "create",
+            "home",
+            "like",
+            "unlike",
+            "liked",
+            "add_reply",
+        ):
+            return (IsAuthenticated(),)
+
+        if self.action in ("update", "partial_update", "destroy"):
+            return (IsAuthor(),)
+
+        return super().get_permissions()
 
     @action(
         methods=["GET"],
