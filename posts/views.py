@@ -34,6 +34,11 @@ class PostViewSet(viewsets.ModelViewSet):
             for tag in tags:
                 queryset = queryset.filter(tags__name__in=[tag])
 
+        if self.action in ("list", "retrieve"):
+            queryset = queryset.select_related(
+                "user__profile"
+            ).prefetch_related("images", "tags")
+
         return queryset.distinct()
 
     def get_serializer_class(self):
@@ -76,7 +81,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if user not in post.likes.all():
             post.likes.add(user)
             return Response(
-                {"status": "Liked the post"}, status=status.HTTP_200_OK
+                {}, status=status.HTTP_200_OK
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -90,7 +95,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if user in post.likes.all():
             post.likes.remove(user)
             return Response(
-                {"status": "Unliked the post"}, status=status.HTTP_200_OK
+                {}, status=status.HTTP_200_OK
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
