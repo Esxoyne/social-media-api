@@ -73,8 +73,10 @@ class PostViewSet(viewsets.ModelViewSet):
         permission_classes=[AllowAny],
     )
     def home(self, request) -> Response:
-        """Retrieve posts created by the current user
-        or the users they are following"""
+        """
+        Retrieve posts created by the current user
+        or the users they are following
+        """
         posts = self.get_queryset().filter(
             Q(user=request.user)
             | Q(user__profile__followers=request.user.profile)
@@ -90,7 +92,9 @@ class PostViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated],
     )
     def like(self, request, pk=None) -> Response:
-        """Like a post"""
+        """
+        Like a post
+        """
         user = request.user
         post = self.get_object()
 
@@ -104,7 +108,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @like.mapping.delete
     def unlike(self, request, pk=None) -> Response:
-        """Unlike a post"""
+        """
+        Unlike a post
+        """
         user = request.user
         post = self.get_object()
 
@@ -123,7 +129,9 @@ class PostViewSet(viewsets.ModelViewSet):
         permission_classes=[AllowAny],
     )
     def liked(self, request) -> Response:
-        """Retrieve liked posts"""
+        """
+        Retrieve liked posts
+        """
         posts = self.get_queryset().filter(likes__id=request.user.id)
         serializer = self.get_serializer(posts, many=True)
 
@@ -136,7 +144,9 @@ class PostViewSet(viewsets.ModelViewSet):
         permission_classes=[AllowAny],
     )
     def replies(self, request, pk=None) -> Response:
-        """Retrieve replies"""
+        """
+        Retrieve replies
+        """
         parent = self.get_object()
         replies = self.get_queryset().filter(parent=parent)
         serializer = self.get_serializer(replies, many=True)
@@ -145,7 +155,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @replies.mapping.post
     def add_reply(self, request, pk=None) -> Response:
-        """Add a reply"""
+        """
+        Add a reply
+        """
         parent = self.get_object()
         serializer = self.get_serializer(data=request.data)
 
