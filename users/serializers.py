@@ -6,6 +6,10 @@ from django_countries.serializers import CountryFieldMixin
 from .models import Profile
 
 
+class EmptySerializer(serializers.Serializer):
+    pass
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()

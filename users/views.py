@@ -12,6 +12,7 @@ from drf_spectacular.utils import (
 
 from .models import Profile
 from .serializers import (
+    EmptySerializer,
     FollowerListSerializer,
     FollowingListSerializer,
     ProfileListSerializer,
@@ -150,7 +151,7 @@ class ProfileDetailView(generics.RetrieveAPIView):
 
 class ProfileFollowView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = ProfileSerializer
+    serializer_class = EmptySerializer
 
     def get_object(self, pk):
         return get_object_or_404(Profile, pk=pk)

@@ -13,6 +13,7 @@ from drf_spectacular.utils import (
 from .models import Post
 from .permissions import IsAuthor
 from .serializers import (
+    EmptySerializer,
     PostListSerializer,
     PostRetrieveSerializer,
     PostSerializer,
@@ -50,6 +51,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
         if self.action == "retrieve":
             return PostRetrieveSerializer
+
+        if self.action == "like":
+            return EmptySerializer
 
         return PostSerializer
 

@@ -11,6 +11,10 @@ from users.serializers import (
 )
 
 
+class EmptySerializer(serializers.Serializer):
+    pass
+
+
 class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImage
