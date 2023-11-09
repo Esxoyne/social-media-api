@@ -148,8 +148,9 @@ class ProfileDetailView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
 
 
-class ProfileFollowView(APIView):
+class ProfileFollowView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = ProfileSerializer
 
     def get_object(self, pk):
         return get_object_or_404(Profile, pk=pk)
