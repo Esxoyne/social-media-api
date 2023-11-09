@@ -5,6 +5,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+)
 
 from .models import Profile
 from .serializers import (
@@ -42,7 +46,7 @@ class SignUpView(generics.GenericAPIView):
 
 class ManageAccountView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, Update account info
+    Retrieve, update or delete current user's account
     """
 
     permission_classes = (IsAuthenticated,)
@@ -54,7 +58,7 @@ class ManageAccountView(generics.RetrieveUpdateDestroyAPIView):
 
 class ManageProfileView(generics.RetrieveUpdateAPIView):
     """
-    Retrieve, Update user profile
+    Retrieve or update current user's profile
     """
 
     permission_classes = (IsAuthenticated,)
@@ -71,7 +75,7 @@ class ManageProfileView(generics.RetrieveUpdateAPIView):
 
 class ManageProfilePictureView(generics.UpdateAPIView):
     """
-    Retrieve, Update user profile picture
+    Update current user's profile picture
     """
 
     serializer_class = ProfilePictureSerializer
@@ -111,10 +115,32 @@ class ProfileListView(generics.ListAPIView):
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "username",
+                type=str,
+                description="Search by username",
+            ),
+            OpenApiParameter(
+                "bio",
+                type=str,
+                description="Search by profile bio",
+            ),
+            OpenApiParameter(
+                "country",
+                type=str,
+                description="Filter by country name",
+            ),
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ProfileDetailView(generics.RetrieveAPIView):
     """
-    Retrieve user profiles
+    Retrieve user profile
     """
 
     queryset = Profile.objects.select_related("user")
@@ -123,15 +149,15 @@ class ProfileDetailView(generics.RetrieveAPIView):
 
 
 class ProfileFollowView(APIView):
-    """
-    Follow/unfollow profile
-    """
     permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         return get_object_or_404(Profile, pk=pk)
 
     def post(self, request, pk, *args, **kwargs):
+        """
+        Follow profile
+        """
         user_profile = request.user.profile
         target = self.get_object(pk)
 
@@ -147,6 +173,9 @@ class ProfileFollowView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request, pk, *args, **kwargs):
+        """
+        Unfollow profile
+        """
         user_profile = request.user.profile
         target = self.get_object(pk)
 
@@ -160,12 +189,18 @@ class ProfileFollowView(APIView):
 
 
 class FollowerListView(generics.RetrieveAPIView):
+    """
+    List user's followers
+    """
     queryset = Profile.objects.prefetch_related("followers__user")
     serializer_class = FollowerListSerializer
     permission_classes = (AllowAny,)
 
 
 class FollowingListView(generics.RetrieveAPIView):
+    """
+    List user's following
+    """
     queryset = Profile.objects.prefetch_related("following__user")
     serializer_class = FollowingListSerializer
     permission_classes = (AllowAny,)

@@ -5,7 +5,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
-
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+)
 
 from .models import Post
 from .permissions import IsAuthor
@@ -130,7 +133,7 @@ class PostViewSet(viewsets.ModelViewSet):
     )
     def liked(self, request) -> Response:
         """
-        Retrieve liked posts
+        Retrieve posts liked by the current user
         """
         posts = self.get_queryset().filter(likes__id=request.user.id)
         serializer = self.get_serializer(posts, many=True)
@@ -168,3 +171,28 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer, **kwargs):
         serializer.save(user=self.request.user, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "search",
+                type=str,
+                description="Search by text",
+            ),
+            OpenApiParameter(
+                "tags",
+                type={"type": "list", "items": {"type": "string"}},
+                description="Filter by tags",
+            ),
+            OpenApiParameter(
+                "user",
+                type=int,
+                description="Filter by user id"
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        List all posts
+        """
+        return super().list(request, *args, **kwargs)
