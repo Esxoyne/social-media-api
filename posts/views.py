@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils import timezone
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,6 +13,7 @@ from drf_spectacular.utils import (
 
 from .models import Post
 from .permissions import IsAuthor
+from .tasks import defer_post
 from .serializers import (
     EmptySerializer,
     PostListSerializer,
@@ -21,7 +23,7 @@ from .serializers import (
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(published=True)
     serializer_class = PostSerializer
     permission_classes = (AllowAny,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -72,6 +74,23 @@ class PostViewSet(viewsets.ModelViewSet):
             return (IsAuthor(),)
 
         return super().get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        publish_at = serializer.validated_data.pop("publish_at", None)
+        if publish_at and publish_at > timezone.now():
+            post = self.perform_create(serializer, published=False)
+            defer_post.apply_async((post.id,), eta=publish_at)
+        else:
+            self.perform_create(serializer)
+
+        data = serializer.data
+        data["publish_at"] = publish_at
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(
         methods=["GET"],
@@ -169,12 +188,25 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer, parent=parent)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        publish_at = serializer.validated_data.pop("publish_at", None)
+        if publish_at:
+            post = self.perform_create(
+                serializer,
+                published=False,
+                parent=parent,
+            )
+            defer_post.apply_async((post.id,), eta=publish_at)
+        else:
+            self.perform_create(serializer, parent=parent)
+
+        data = serializer.data
+        data["publish_at"] = publish_at
+
+        return Response(data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer, **kwargs):
-        serializer.save(user=self.request.user, **kwargs)
+        return serializer.save(user=self.request.user, **kwargs)
 
     @extend_schema(
         parameters=[
