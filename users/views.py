@@ -21,6 +21,7 @@ from .serializers import (
     UserSerializer,
     UserSignUpSerializer,
 )
+from core.pagination import StandardResultSetPagination
 from posts.models import Post
 from posts.serializers import PostListSerializer
 
@@ -95,6 +96,7 @@ class ProfileListView(generics.ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileListSerializer
     permission_classes = (AllowAny,)
+    pagination_class = StandardResultSetPagination
 
     def get_queryset(self):
         queryset = self.queryset.all()
@@ -198,6 +200,7 @@ class FollowerListView(generics.RetrieveAPIView):
     queryset = Profile.objects.prefetch_related("followers__user")
     serializer_class = FollowerListSerializer
     permission_classes = (AllowAny,)
+    pagination_class = StandardResultSetPagination
 
 
 class FollowingListView(generics.RetrieveAPIView):
@@ -207,6 +210,7 @@ class FollowingListView(generics.RetrieveAPIView):
     queryset = Profile.objects.prefetch_related("following__user")
     serializer_class = FollowingListSerializer
     permission_classes = (AllowAny,)
+    pagination_class = StandardResultSetPagination
 
 
 class PostsListView(generics.ListAPIView):
@@ -216,6 +220,7 @@ class PostsListView(generics.ListAPIView):
     queryset = Post.objects.filter(published=True)
     serializer_class = PostListSerializer
     permission_classes = (AllowAny,)
+    pagination_class = StandardResultSetPagination
 
     def get_queryset(self):
         queryset = self.queryset

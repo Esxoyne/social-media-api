@@ -20,12 +20,14 @@ from .serializers import (
     PostRetrieveSerializer,
     PostSerializer,
 )
+from core.pagination import StandardResultSetPagination
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(published=True)
     serializer_class = PostSerializer
     permission_classes = (AllowAny,)
+    pagination_class = StandardResultSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ("user",)
     search_fields = ("text",)
