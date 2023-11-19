@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import (
@@ -22,6 +21,8 @@ from .serializers import (
     UserSerializer,
     UserSignUpSerializer,
 )
+from posts.models import Post
+from posts.serializers import PostListSerializer
 
 
 class SignUpView(generics.GenericAPIView):
@@ -206,3 +207,18 @@ class FollowingListView(generics.RetrieveAPIView):
     queryset = Profile.objects.prefetch_related("following__user")
     serializer_class = FollowingListSerializer
     permission_classes = (AllowAny,)
+
+
+class PostsListView(generics.ListAPIView):
+    """
+    List user's posts
+    """
+    queryset = Post.objects.filter(published=True)
+    serializer_class = PostListSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        profile_id = self.kwargs.get("pk")
+        user = Profile.objects.get(pk=profile_id).user
+        return queryset.filter(user=user)
