@@ -48,6 +48,11 @@ urlpatterns = [
         views.FollowingListView.as_view(),
         name="profile-following",
     ),
+    path(
+        "profiles/<int:pk>/posts/",
+        views.PostsListView.as_view(),
+        name="profile-posts",
+    ),
 ]
 
 app_name = "users"
