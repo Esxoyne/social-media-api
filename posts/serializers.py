@@ -41,6 +41,7 @@ class PostSerializer(
     )
     likes = serializers.IntegerField(source="like_count", read_only=True)
     replies = serializers.IntegerField(source="reply_count", read_only=True)
+    publish_at = serializers.DateTimeField(required=False)
 
     def validate_images(self, images):
         if len(images) > 10:
@@ -69,6 +70,7 @@ class PostSerializer(
             "created_at",
             "updated_at",
             "tags",
+            "publish_at",
         )
         read_only_fields = ("user", "parent", "likes")
 
