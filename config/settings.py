@@ -14,6 +14,8 @@ from datetime import timedelta
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -169,4 +171,17 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "REST API for a social media platform",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_TIMEZONE = "Europe/Kyiv"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BEAT_SCHEDULE = {
+    "flush_expired_tokens": {
+        "task": "users.tasks.flush_expired_tokens",
+        "schedule": crontab(minute=0, hour=0),
+    }
 }
