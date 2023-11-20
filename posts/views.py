@@ -60,7 +60,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action == "like":
             return EmptySerializer
 
-        if self.action == "create":
+        if self.action in ("create", "add_reply"):
             return PostCreateSerializer
 
         return PostSerializer
