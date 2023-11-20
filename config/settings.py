@@ -16,6 +16,11 @@ from pathlib import Path
 
 from celery.schedules import crontab
 
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,14 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-^7(rk_xp*rt2do2=v^tjqh=p^96y1m4x7h!#-jp8rl&)y%$l2f"
-)
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv("DEBUG", 0))
 
-ALLOWED_HOSTS = []
+# "ALLOWED_HOSTS" should be a single string of hosts with a space between each.
+# For example: "ALLOWED_HOSTS=localhost 127.0.0.1 [::1]"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(" ")
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -54,6 +59,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "django_countries",
     "taggit",
+    "core",
     "users",
     "posts",
 ]
@@ -95,8 +101,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": os.getenv("POSTGRES_HOST"),
+        "PORT": os.getenv("POSTGRES_PORT"),
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
     }
 }
 
@@ -131,7 +141,7 @@ AUTH_USER_MODEL = "users.User"
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Europe/Kyiv"
+TIME_ZONE = os.getenv("TIME_ZONE")
 
 USE_I18N = True
 
@@ -143,7 +153,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = "/vol/web/media"
 MEDIA_URL = "/media/"
 
 # Default primary key field type
@@ -157,6 +167,14 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "2000/day",
+        "user": "10000/day",
+    },
 }
 
 SIMPLE_JWT = {
@@ -173,9 +191,9 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
-CELERY_TIMEZONE = "Europe/Kyiv"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE")
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
