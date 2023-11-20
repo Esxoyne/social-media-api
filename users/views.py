@@ -11,7 +11,6 @@ from drf_spectacular.utils import (
 
 from .models import Profile
 from .serializers import (
-    EmptySerializer,
     FollowerListSerializer,
     FollowingListSerializer,
     ProfileListSerializer,
@@ -22,6 +21,7 @@ from .serializers import (
     UserSignUpSerializer,
 )
 from core.pagination import StandardResultSetPagination
+from core.serializers import EmptySerializer
 from posts.models import Post
 from posts.serializers import PostListSerializer
 

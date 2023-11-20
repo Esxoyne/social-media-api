@@ -11,10 +11,6 @@ from users.serializers import (
 )
 
 
-class EmptySerializer(serializers.Serializer):
-    pass
-
-
 class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImage
@@ -39,9 +35,6 @@ class PostSerializer(
     tags = TagListSerializerField(
         child=serializers.CharField(allow_blank=True, allow_null=True),
     )
-    likes = serializers.IntegerField(source="like_count", read_only=True)
-    replies = serializers.IntegerField(source="reply_count", read_only=True)
-    publish_at = serializers.DateTimeField(required=False)
 
     def validate_images(self, images):
         if len(images) > 10:
@@ -65,14 +58,11 @@ class PostSerializer(
             "parent",
             "text",
             "images",
-            "likes",
-            "replies",
             "created_at",
             "updated_at",
             "tags",
-            "publish_at",
         )
-        read_only_fields = ("user", "parent", "likes")
+        read_only_fields = ("user", "parent")
 
     def create(self, validated_data):
         images = validated_data.pop("images", None)
@@ -81,6 +71,25 @@ class PostSerializer(
             for image in images:
                 PostImage.objects.create(post=post, image=image)
         return post
+
+
+class PostCreateSerializer(PostSerializer):
+    publish_at = serializers.DateTimeField(required=False)
+
+    class Meta:
+        model = Post
+        fields = (
+            "id",
+            "user",
+            "parent",
+            "text",
+            "images",
+            "created_at",
+            "updated_at",
+            "tags",
+            "publish_at",
+        )
+        read_only_fields = ("user", "parent")
 
 
 class PostListSerializer(
@@ -120,6 +129,34 @@ class PostListSerializer(
         }
 
 
-class PostRetrieveSerializer(PostSerializer):
+class PostRetrieveSerializer(
+    TaggitSerializer,
+    serializers.ModelSerializer,
+):
     user = ProfileListSerializer(source="user.profile", read_only=True)
     images = PostImageSerializer(many=True, read_only=True)
+    parent = serializers.HyperlinkedRelatedField(
+        view_name="posts:post-detail", read_only=True
+    )
+    likes = serializers.IntegerField(source="like_count", read_only=True)
+    replies = serializers.IntegerField(source="reply_count", read_only=True)
+    tags = TagListSerializerField(
+        child=serializers.CharField(
+            allow_blank=True, allow_null=True, read_only=True
+        ),
+    )
+
+    class Meta:
+        model = Post
+        fields = (
+            "id",
+            "user",
+            "parent",
+            "text",
+            "images",
+            "likes",
+            "replies",
+            "created_at",
+            "updated_at",
+            "tags",
+        )

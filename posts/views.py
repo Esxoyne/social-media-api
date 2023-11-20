@@ -15,12 +15,13 @@ from .models import Post
 from .permissions import IsAuthor
 from .tasks import defer_post
 from .serializers import (
-    EmptySerializer,
+    PostCreateSerializer,
     PostListSerializer,
     PostRetrieveSerializer,
     PostSerializer,
 )
 from core.pagination import StandardResultSetPagination
+from core.serializers import EmptySerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -42,10 +43,10 @@ class PostViewSet(viewsets.ModelViewSet):
             for tag in tags:
                 queryset = queryset.filter(tags__name__in=[tag])
 
-        if self.action in ("list", "retrieve"):
+        if self.action in ("list", "retrieve", "home"):
             queryset = queryset.select_related(
                 "user__profile"
-            ).prefetch_related("images", "tags")
+            ).prefetch_related("images", "tags", "likes")
 
         return queryset.distinct()
 
@@ -58,6 +59,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
         if self.action == "like":
             return EmptySerializer
+
+        if self.action == "create":
+            return PostCreateSerializer
 
         return PostSerializer
 
