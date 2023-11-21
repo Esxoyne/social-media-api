@@ -35,7 +35,7 @@ def generate_file_name(info, filename):
 def profile_picture_file_path(instance, filename):
     filename = generate_file_name(instance.user.username, filename)
 
-    return os.path.join("uploads/profile_pictures/", filename)
+    return os.path.join("uploads", "profile_pictures", filename)
 
 
 class Profile(models.Model):

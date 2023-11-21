@@ -59,7 +59,7 @@ def generate_file_name(info, filename):
 def post_image_file_path(instance, filename):
     filename = generate_file_name(instance.post.text[:30], filename)
 
-    return os.path.join("uploads/post_images/", filename)
+    return os.path.join("uploads", "post_images", filename)
 
 
 class PostImage(models.Model):
