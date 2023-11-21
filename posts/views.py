@@ -40,8 +40,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         if tags:
             tags = tags.split(",")
-            for tag in tags:
-                queryset = queryset.filter(tags__name__in=[tag])
+            queryset = queryset.filter(tags__name__in=tags)
 
         if self.action in ("list", "retrieve", "home"):
             queryset = queryset.select_related(
