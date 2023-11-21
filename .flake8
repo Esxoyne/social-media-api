@@ -1,0 +1,7 @@
+[flake8]
+inline-quotes = "
+ignore = F401, W503
+max-line-length = 79
+exclude =
+    **migrations
+    venv
