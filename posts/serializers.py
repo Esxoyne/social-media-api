@@ -65,11 +65,10 @@ class PostSerializer(
         read_only_fields = ("user", "parent")
 
     def create(self, validated_data):
-        images = validated_data.pop("images", None)
+        images = validated_data.pop("images", None) or []
         post = super().create(validated_data)
-        if images:
-            for image in images:
-                PostImage.objects.create(post=post, image=image)
+        for image in images:
+            PostImage.objects.create(post=post, image=image)
         return post
 
 
